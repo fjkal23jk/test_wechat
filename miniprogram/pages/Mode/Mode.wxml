@@ -1,0 +1,12 @@
+<!--pages/Mode/Mode.wxml-->
+<view class="container">
+  <view class="userinfo">
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  </view>
+  <view class="usermotto">
+    <button><navigator url='../ParkerInformation/ParkerInformation?open_id={{open_id}}'>I'm a Parker</navigator></button>
+    <text class="user-motto">\n</text>
+    <button><navigator url='../LeaverInformation/LeaverInformation?open_id={{open_id}}'>I'm a Leaver</navigator></button>
+  </view>
+</view>
+

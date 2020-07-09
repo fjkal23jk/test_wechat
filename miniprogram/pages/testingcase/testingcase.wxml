@@ -1,0 +1,3 @@
+<!--pages/testingcase/testingcase.wxml-->
+<text>pages/testingcase/testingcase.wxml</text>
+<button bindtap="cases">create case</button>

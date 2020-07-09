@@ -1,0 +1,23 @@
+{
+  "pages": [
+    
+    "pages/index/index",
+    "pages/testingcase/testingcase",
+    "pages/Mapping/Mapping",
+    "pages/Code/Code",
+    "pages/Confirm/Confirm",
+    "pages/Personal_Info/Personal_Info",
+    "pages/LeaverInformation/LeaverInformation",
+    "pages/Mode/Mode",
+    "pages/ParkerInformation/ParkerInformation"
+  ],
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "云开发 QuickStart",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

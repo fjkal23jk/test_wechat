@@ -1,0 +1,17 @@
+<!--pages/Mapping/Mapping.wxml-->
+<view class="container">
+  <view class="page-body">
+    <button style="margin: 30rpx 0" bindtap="get_user_location">Get Location</button>
+  </view>
+  <view class="update">   
+    
+    <text>address is: {{address}}\n</text>
+    <text>latitude is: {{latitude}}\n</text>
+    <text>longitude is: {{longitude}}\n</text>
+
+  </view>
+  <view>
+    <map id="map" scale="14" include-points="{{points}}"  show-locationstyle="width: 100%; height: 1000px;" markers="{{markers}}" bindmarkertap="goToLocation"></map>
+    
+  </view>
+</view>

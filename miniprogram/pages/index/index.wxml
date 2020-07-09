@@ -1,0 +1,20 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+
+    <block wx:else>
+      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+      <view class="usermotto">
+        <text class="user-motto">{{motto}}</text>
+        <text class="currPoint">{{currPoint}}</text>
+        <text class="user-motto">\n\n</text>
+  
+        <button bindtap="getCurrentPoint">Update Current Point</button>
+        <text class="user-motto">\n</text>
+        <button bindtap="Mode_Page">Next Step</button>
+      </view>
+    </block>
+  </view>
+</view>

@@ -1,0 +1,7 @@
+/* pages/ParkerInformation/ParkerInformation.wxss */
+.weui-cell__bd{
+  margin: 0rpx 0rpx 45rpx 20rpx;
+}
+.section{
+  margin: 0rpx 0rpx 45rpx 20rpx;
+}
