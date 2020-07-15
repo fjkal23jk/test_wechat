@@ -10,25 +10,23 @@ Page({
     latitude: position_latitude,
     longitude: position_longitude,
     points:[{"longitude": "","longitude": "" }],
-    markers: [{
-      // follow this format for markers
-      iconPath: "/images/user.png",
-      id: 0,
-      latitude: 37.711442,
-      longitude: -122.468097,
-      width: 30,
-      height: 30
+    markers: [],
+    show: false,
+    selectedButton: "",
+    buttons: [
+      {
+          type: 'default',
+          className: '',
+          text: 'Decline',
+          value: 0
       },
       {
-        // follow this format for markers
-        iconPath: "/images/user.png",
-        id: 1,
-        latitude: 37.7099,
-        longitude: -122.4675,
-        width: 30,
-        height: 30
+          type: 'primary',
+          className: '',
+          text: 'Confirm',
+          value: 1
       }
-    ]
+  ]
   },
 
   goToLocation: function(e){
@@ -41,11 +39,15 @@ Page({
         break;
       }
       if(markerID === marker.id){
+        this.setData({
+          show: true,
+        })
         wx.openLocation({
           latitude: marker.latitude,
           longitude: marker.longitude,
           scale: 18
         })
+
         break;
       }
     }
@@ -55,40 +57,86 @@ Page({
   get_user_location: function(){
     var that = this
     var tempMarkers = this.data.markers
-    wx.chooseLocation({
-      success: function (res) {
-        console.log(res,"location")
-        console.log(res.name)
-        console.log(res.latitude)
-        console.log(res.longitude)
-        console.log(res.address)
-        position_address = res.address
-        position_latitude = res.latitude
-        position_longitude = res.longitude
-        tempMarkers.push({
-          iconPath: "/images/user.png",
-          id: -1,
+    that.setData({
+      markers: []
+    })
+    let promise = new Promise(function(resolve, reject){
+      wx.chooseLocation({
+        success: function (res) {
+          console.log(res,"location")
+          console.log(res.name)
+          console.log(res.latitude)
+          console.log(res.longitude)
+          console.log(res.address)
+          position_address = res.address
+          position_latitude = res.latitude
+          position_longitude = res.longitude
+          tempMarkers.push({
+            iconPath: "/images/user.png",
+            id: -1,
+            latitude: position_latitude,
+            longitude: position_longitude,
+            width: 30,
+            height: 30
+          })
+        that.setData({
+          address: position_address,
           latitude: position_latitude,
           longitude: position_longitude,
-          width: 30,
-          height: 30
+          points: [{"longitude": position_longitude,"latitude": position_latitude }],
+          markers: tempMarkers
         })
-      that.setData({
-        address: position_address,
-        latitude: position_latitude,
-        longitude: position_longitude,
-        points: [{"longitude": position_longitude,"latitude": position_latitude }],
-        markers: tempMarkers
-      })
-      // get all leavers location within current latitude/longtitude and put in markers array
-      },
-      fail: function () {
-      // fail
-      },
-      complete: function () {
-      // complete
+        resolve([position_latitude, position_longitude]);
+        // get all leavers location within current latitude/longtitude and put in markers array
+        },
+        fail: function () {
+        // fail
+          reject(new Error("…"));
+        },
+        complete: function () {
+        // complete
+        }
+        })
+    });
+    promise.then(
+      function(result){
+        const db = wx.cloud.database({
+          env: 'test-4qsby'
+        })
+        var longitudeMax = Math.max(result[1] - 0.003, result[1] + 0.003)
+        var longitudeMin = Math.min(result[1] - 0.003, result[1] + 0.003)
+        var latitudeMax = Math.max(result[0] - 0.003, result[0] + 0.003)
+        var latitudeMin = Math.min(result[0] - 0.003, result[0] + 0.003)
+        db.collection('users').where({
+          longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
+          latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax))
+        }).get({
+          success: res => {
+            console.log(res);
+            var i = 0;
+            for (var key in res.data) {
+              tempMarkers.push({
+                iconPath: "/images/user.png",
+                id: i,
+                latitude: res.data[key].latitude,
+                longitude: res.data[key].longitude,
+                width: 30,
+                height: 30
+              })
+              i++;
+            }
+            that.setData({
+              markers: tempMarkers
+            })
+            console.log('done')
+          },
+          fail: err => {
+            console.log(err);
+          }
+        })
       }
-      })
+    )
+    
   },
 
   onShow:function () {
