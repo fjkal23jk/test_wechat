@@ -15,13 +15,11 @@
       bindbuttontap="buttontap"
       show="{{show}}"
       maskClosable="{{false}}" 
-      title="测试标题B" 
-      subTitle="测试标题B的副标题"
-      desc="辅助描述内容，可根据实际需要安排"
-      tips="辅助提示内容，可根据实际需要安排"
+      title="确认地址: {{destination}}" 
+      desc="请再次确认地址名称: {{destination}}"
       buttons="{{buttons}}"
     ></mp-halfScreenDialog>
-    <map id="map" scale="14" include-points="{{points}}"  show-locationstyle="width: 100%; height: 1000px;" markers="{{markers}}" bindmarkertap="goToLocation"></map>
+    <map id="map" scale="14" include-points="{{points}}"  show-locationstyle="width: 100%; height: 1000px;" markers="{{markers}}" bindmarkertap="goToLocation" bindcallouttap = "bindcallouttap" ></map>
     
   </view>
 </view>

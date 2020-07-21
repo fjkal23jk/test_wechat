@@ -15,18 +15,12 @@ Page({
     selectedButton: "",
     buttons: [
       {
-          type: 'default',
-          className: '',
-          text: 'Decline',
-          value: 0
-      },
-      {
           type: 'primary',
           className: '',
           text: 'Confirm',
           value: 1
-      }
-  ]
+      }],
+    destination: "" 
   },
 
   goToLocation: function(e){
@@ -34,19 +28,20 @@ Page({
     for(let marker of this.data.markers){
       if(markerID === -1){
         wx.showToast({
-          title: 'fasdjfksaldfj',
+          title: 'Self',
         })
         break;
       }
       if(markerID === marker.id){
         this.setData({
           show: true,
+          destination: marker.callout.content
         })
-        wx.openLocation({
-          latitude: marker.latitude,
-          longitude: marker.longitude,
-          scale: 18
-        })
+        // wx.openLocation({
+        //   latitude: marker.latitude,
+        //   longitude: marker.longitude,
+        //   scale: 18
+        // })
 
         break;
       }
@@ -77,7 +72,8 @@ Page({
             latitude: position_latitude,
             longitude: position_longitude,
             width: 30,
-            height: 30
+            height: 30,
+            
           })
         that.setData({
           address: position_address,
@@ -121,7 +117,17 @@ Page({
                 latitude: res.data[key].latitude,
                 longitude: res.data[key].longitude,
                 width: 30,
-                height: 30
+                height: 30,
+                callout: {
+                  content: res.data[key].name,
+                  fontSize: 14,
+                  bgColor: "#FFF",
+                  borderWidth: 1,
+                  borderColor: "#CCC",
+                  padding: 4,
+                  display: "BYCLICK",
+                  textAlign: "center"
+                  }
               })
               i++;
             }
@@ -136,6 +142,10 @@ Page({
         })
       }
     )
+    
+  },
+
+  buttontap: function(){
     
   },
 
