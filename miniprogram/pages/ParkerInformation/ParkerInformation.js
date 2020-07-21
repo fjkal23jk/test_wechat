@@ -58,7 +58,7 @@ Page({
         }
       })
       wx.navigateTo({
-        url: '../Mapping/Mapping'
+        url: '../Mapping/Mapping?open_id=' + this.data.open_id
       })
     }
   },

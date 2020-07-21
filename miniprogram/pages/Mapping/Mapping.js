@@ -6,6 +6,7 @@ var position_longitude = "";
 Page({
   
   data: {
+    open_id: "",
     address: position_address,
     latitude: position_latitude,
     longitude: position_longitude,
@@ -13,6 +14,10 @@ Page({
     markers: [],
     show: false,
     selectedButton: "",
+    selectedMarker: {
+      longitude: 0,
+      latitude: 0
+    },
     buttons: [
       {
           type: 'primary',
@@ -22,7 +27,6 @@ Page({
       }],
     destination: "" 
   },
-
   goToLocation: function(e){
     var markerID = e.markerId;
     for(let marker of this.data.markers){
@@ -35,15 +39,13 @@ Page({
       if(markerID === marker.id){
         this.setData({
           show: true,
-          destination: marker.callout.content
+          destination: marker.callout.content,
+          selectedMarker: {
+            latitude: marker.latitude,
+            longitude: marker.longitude
+          }
         })
-        // wx.openLocation({
-        //   latitude: marker.latitude,
-        //   longitude: marker.longitude,
-        //   scale: 18
-        // })
 
-        break;
       }
     }
     // navigatet to next page
@@ -145,8 +147,26 @@ Page({
     
   },
 
-  buttontap: function(){
-    
+  buttontap: function(e){
+    console.log(e.detail)
+    if(e.detail.item.text === 'Confirm'){
+      const db = wx.cloud.database({
+        env: 'test-4qsby'
+      })
+      db.collection('users').doc(this.data.open_id).update({
+        data: {
+          type: 1, // -1 initial, 0 leaver, 1 parker,
+          latitude: this.data.selectedMarker.latitude,
+          longitude: this.data.selectedMarker.longitude
+        }
+      })
+      
+      // redirect to index
+      
+    } else {
+      console.log('err')
+    }
+
   },
 
   onShow:function () {
@@ -156,7 +176,10 @@ Page({
   
 
   onLoad: function (options) {
-
+    console.log('At Mapping page ->', options.open_id);
+    this.setData({
+      open_id: options.open_id
+    })
   },
 
   /**

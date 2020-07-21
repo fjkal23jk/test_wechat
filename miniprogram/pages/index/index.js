@@ -54,7 +54,8 @@ Page({
       url: '../Mode/Mode'
     })
   },
-  onLoad: function () {
+  onLoad: function (options) {
+
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
