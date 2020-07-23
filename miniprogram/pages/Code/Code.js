@@ -5,14 +5,41 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    open_id : ''
   },
+  // I I 
+
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    this.setData({
+      open_id: options.open_id
+    })
+  },
 
+  
+  withdraw: function(){
+    const db = wx.cloud.database({
+      env: 'test-4qsby'
+    });
+
+  },
+
+  openMap: function(){
+  
+    const db = wx.cloud.database({
+      env: 'test-4qsby'
+    });
+    db.collection('users').doc(this.open_id).get().then(
+      res => {
+        wx.openLocation({
+          latitude: res.data.latitude,
+          longitude: res.data.longitude,
+        })
+      }
+    )
   },
 
   /**

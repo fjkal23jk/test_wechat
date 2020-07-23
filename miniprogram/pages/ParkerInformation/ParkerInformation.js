@@ -5,7 +5,8 @@ Page({
     note: '',
     open_id: '',
     pickerHidden: true,
-    chosen: ''
+    chosen: '',
+    date: '',
   },
   bindChange: function(e) {
     info[e.currentTarget.id] = e.detail.value
@@ -57,6 +58,7 @@ Page({
           time: info['time'],
         }
       })
+      console.log('finished updating')
       wx.navigateTo({
         url: '../Mapping/Mapping?open_id=' + this.data.open_id
       })
@@ -95,7 +97,7 @@ Page({
   },
   bindDateChange: function(e) {
     console.log('picker发送选择改变，携带值为', e.detail.value);
-    info['data'] = e.detail.value;
+    info['date'] = e.detail.value;
     this.setData({
       date: e.detail.value
     })
@@ -110,9 +112,13 @@ Page({
 
   onLoad: function (options) {
     console.log('At Parker page ->', options.open_id);
+    var today = new Date()
+    var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
     this.setData({
-      open_id: options.open_id
+      open_id: options.open_id,
+      date: currentDate
     })
+    
   },
 
   /**

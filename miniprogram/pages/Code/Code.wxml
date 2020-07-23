@@ -1,2 +1,4 @@
 <!--pages/Code/Code.wxml-->
 <text>pages/Code/Code.wx</text>
+<button bindtap="openMap">Find Your Destination</button>
+<button bindtap="withdraw">Withdraw</button>

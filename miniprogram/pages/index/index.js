@@ -30,7 +30,7 @@ Page({
     console.log('Mode page');
     if (check_type){
       wx.navigateTo({
-        url: '../Code/Code'
+        url: '../Code/Code?open_id=' + this.data.open_id
       })
     }
     else{
@@ -55,35 +55,47 @@ Page({
     })
   },
   onLoad: function (options) {
-
-    if (app.globalData.userInfo) {
+    // get open_id
+    // set hasUserInfo -> true
+    if (typeof options.open_id !== 'undefined'){
+      console.log('here is ' + options.open_id)
       this.setData({
         userInfo: app.globalData.userInfo,
+        open_id: options.open_id,
         hasUserInfo: true
-      });
-    } else if (this.data.canIUse){
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-      }
+      })
+      check_type = true
     } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
+      if (app.globalData.userInfo) {
+        this.setData({
+          userInfo: app.globalData.userInfo,
+          hasUserInfo: true
+        });
+      } else if (this.data.canIUse){
+        // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+        // 所以此处加入 callback 以防止这种情况
+        app.userInfoReadyCallback = res => {
           this.setData({
             userInfo: res.userInfo,
             hasUserInfo: true
           })
         }
-      })
+      } else {
+        // 在没有 open-type=getUserInfo 版本的兼容处理
+        wx.getUserInfo({
+          success: res => {
+            app.globalData.userInfo = res.userInfo
+            this.setData({
+              userInfo: res.userInfo,
+              hasUserInfo: true
+            })
+          }
+        })
+      }
     }
   },
   getUserInfo: function(e) {
+    console.log(e)
     this.getOpenID().then(
       res=>{
         app.globalData.userInfo = e.detail.userInfo
@@ -93,7 +105,7 @@ Page({
           open_id: res
         })
       }
-    );
+    )
   },
 
   getOpenID() {

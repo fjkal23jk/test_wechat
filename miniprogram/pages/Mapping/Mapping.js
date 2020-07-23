@@ -3,6 +3,8 @@ var res = {};
 var position_address = "";
 var position_latitude = "";
 var position_longitude = "";
+var time = "";
+var date = "";
 Page({
   
   data: {
@@ -105,9 +107,19 @@ Page({
         var longitudeMin = Math.min(result[1] - 0.003, result[1] + 0.003)
         var latitudeMax = Math.max(result[0] - 0.003, result[0] + 0.003)
         var latitudeMin = Math.min(result[0] - 0.003, result[0] + 0.003)
+
+        var min = time.substring(2)
+        var hrMax = String(parseInt(time.substring(0,2)) + 1) + min
+        var hrMin = String(parseInt(time.substring(0,2)) - 1) + min
+
+        console.log('hrMax: ' + hrMax)
+        console.log('hrMin: ' + hrMin)
         db.collection('users').where({
           longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
-          latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax))
+          latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax)),
+          date: date,
+          time: db.command.gt(hrMin).and(db.command.lt(hrMax)),
+          type: 0
         }).get({
           success: res => {
             console.log(res);
@@ -162,6 +174,9 @@ Page({
       })
       
       // redirect to index
+      wx.reLaunch({
+        url: '../index/index?open_id=' + this.data.open_id
+      })
       
     } else {
       console.log('err')
@@ -180,6 +195,15 @@ Page({
     this.setData({
       open_id: options.open_id
     })
+    const db = wx.cloud.database({
+      env: 'test-4qsby'
+    })
+    db.collection('users').doc(this.data.open_id).get().then(
+      res => {
+        time = res.data.time;
+        date = res.data.date;
+      }
+    )
   },
 
   /**

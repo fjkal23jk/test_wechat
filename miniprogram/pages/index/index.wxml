@@ -12,7 +12,6 @@
         <text class="user-motto">{{motto}}</text>
         <text class="currPoint">{{currPoint}}</text>
         <text class="user-motto">\n\n</text>
-  
         <button bindtap="getCurrentPoint">Update Current Point</button>
         <text class="user-motto">\n</text>
         <button bindtap="Mode_Page">Next Step</button>
