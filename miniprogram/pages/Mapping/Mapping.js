@@ -132,10 +132,10 @@ Page({
         console.log('hrMax: ' + hrMax)
         console.log('hrMin: ' + hrMin)
         db.collection('users').where({
-          longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
-          latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax)),
-          date: date,
-          time: db.command.gt(hrMin).and(db.command.lt(hrMax)),
+          //longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
+          //latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax)),
+          //date: date,
+          //time: db.command.gt(hrMin).and(db.command.lt(hrMax)),
           type: 0
         }).get({
           success: res => {
