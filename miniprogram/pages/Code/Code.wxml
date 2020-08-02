@@ -1,4 +1,17 @@
 <!--pages/Code/Code.wxml-->
-<text>pages/Code/Code.wx</text>
+<text >\n\n</text>
 <button bindtap="openMap">Find Your Destination</button>
+<text >\n\n</text>
 <button bindtap="withdraw">Withdraw</button>
+
+<view>
+    <mp-halfScreenDialog 
+      bindbuttontap="confirm_whitdraw"
+      show="{{show}}"
+      maskClosable="{{false}}" 
+      title="是否确认取消" 
+      desc="已预约时间日期：{{time}} , {{date}}"
+      buttons="{{buttons}}"
+    ></mp-halfScreenDialog>
+    
+  </view>

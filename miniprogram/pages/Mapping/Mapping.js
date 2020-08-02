@@ -12,13 +12,16 @@ Page({
     address: position_address,
     latitude: position_latitude,
     longitude: position_longitude,
-    points:[{"longitude": "","longitude": "" }],
+    points:[{"longitude": "","latitude": "" }],
     markers: [],
     show: false,
     selectedButton: "",
     selectedMarker: {
       longitude: 0,
-      latitude: 0
+      latitude: 0,
+      time: '',
+      date: '',
+      _openid:''
     },
     buttons: [
       {
@@ -27,7 +30,7 @@ Page({
           text: 'Confirm',
           value: 1
       }],
-    destination: "" 
+    destination: ""
   },
   goToLocation: function(e){
     var markerID = e.markerId;
@@ -44,7 +47,10 @@ Page({
           destination: marker.callout.content,
           selectedMarker: {
             latitude: marker.latitude,
-            longitude: marker.longitude
+            longitude: marker.longitude,
+            time: marker.time,
+            date: marker.date,
+            _openid: marker._openid
           }
         })
 
@@ -59,7 +65,17 @@ Page({
     that.setData({
       markers: []
     })
+    wx.getSetting({
+      success (res) {
+        console.log(res.authSetting)
+        // res.authSetting = {
+        //   "scope.userInfo": true,
+        //   "scope.userLocation": true
+        // }
+      }
+    })
     let promise = new Promise(function(resolve, reject){
+      console.log("choosing Location")
       wx.chooseLocation({
         success: function (res) {
           console.log(res,"location")
@@ -89,8 +105,9 @@ Page({
         resolve([position_latitude, position_longitude]);
         // get all leavers location within current latitude/longtitude and put in markers array
         },
-        fail: function () {
+        fail: function (err) {
         // fail
+          console.log(err)
           reject(new Error("…"));
         },
         complete: function () {
@@ -130,6 +147,9 @@ Page({
                 id: i,
                 latitude: res.data[key].latitude,
                 longitude: res.data[key].longitude,
+                time: res.data[key].time,
+                date: res.data[key].date,
+                _openid: res.data[key]._openid,
                 width: 30,
                 height: 30,
                 callout: {
@@ -167,15 +187,20 @@ Page({
       })
       db.collection('users').doc(this.data.open_id).update({
         data: {
-          type: 1, // -1 initial, 0 leaver, 1 parker,
+          type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
           latitude: this.data.selectedMarker.latitude,
-          longitude: this.data.selectedMarker.longitude
+          longitude: this.data.selectedMarker.longitude,
+          time: this.data.selectedMarker.time
         }
       })
-      
+      db.collection('users').doc(this.data._openid).update({
+        data: {
+          type: 2, // -1 initial, 0 leaver, 1 parker, 2, process
+        }
+      })
       // redirect to index
       wx.reLaunch({
-        url: '../index/index?open_id=' + this.data.open_id
+        url: '../index/index?open_id=' + this.data.open_id + '&type=1'
       })
       
     } else {

@@ -28,16 +28,19 @@ Page({
 
   Mode_Page: function() {
     console.log('Mode page');
+    var that = this
+    setTimeout(function(){ 
     if (check_type){
       wx.navigateTo({
-        url: '../Code/Code?open_id=' + this.data.open_id
+        url: '../Code/Code?open_id=' + that.data.open_id
       })
     }
     else{
       wx.navigateTo({
-        url: '../Mode/Mode?open_id=' + this.data.open_id
+        url: '../Mode/Mode?open_id=' + that.data.open_id
       })
-    }
+    }}, 2000);
+    
   },
 
   data: {
@@ -57,8 +60,12 @@ Page({
   onLoad: function (options) {
     // get open_id
     // set hasUserInfo -> true
-    if (typeof options.open_id !== 'undefined'){
-      console.log('here is ' + options.open_id)
+    console.log('here is open_id->' + options.open_id)
+    console.log('here is type->' + options.type)
+    console.log('here is check_type->' + check_type)
+
+    if (typeof options.open_id !== 'undefined' && options.type !== '-1'){
+      console.log('Getted in the if statement')
       this.setData({
         userInfo: app.globalData.userInfo,
         open_id: options.open_id,
@@ -66,6 +73,7 @@ Page({
       })
       check_type = true
     } else {
+      check_type = false
       if (app.globalData.userInfo) {
         this.setData({
           userInfo: app.globalData.userInfo,
@@ -105,8 +113,10 @@ Page({
           open_id: res
         })
       }
+      
     )
   },
+
 
   getOpenID() {
     let promise = new Promise(function(resolve, reject) {
@@ -138,6 +148,7 @@ Page({
           console.log(res.data)
           console.log(res.data.type)
           if (res.data.type !== -1){
+            console.log("line 149")
             check_type = true
           }
         }).catch(function(err){
@@ -153,9 +164,9 @@ Page({
               car_brand: '',
               car_color: '',
               license_plate: '',
-              type: -1, // -1 initial, 0 leaver, 1 parker 
-              time: '',
-              date: ''
+              type: -1, // -1 initial, 0 leaver, 1 parker , 2 in process 
+              time: '00:00',
+              date: '0000-00-00'
             }
           })
         })
