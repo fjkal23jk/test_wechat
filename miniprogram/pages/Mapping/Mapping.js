@@ -5,6 +5,9 @@ var position_latitude = "";
 var position_longitude = "";
 var time = "";
 var date = "";
+const db = wx.cloud.database({
+  env: 'test-4qsby'
+});
 Page({
   
   data: {
@@ -21,7 +24,7 @@ Page({
       latitude: 0,
       time: '',
       date: '',
-      _openid:''
+      _id:''
     },
     buttons: [
       {
@@ -50,7 +53,7 @@ Page({
             longitude: marker.longitude,
             time: marker.time,
             date: marker.date,
-            _openid: marker._openid
+            _id: marker._id
           }
         })
 
@@ -117,9 +120,6 @@ Page({
     });
     promise.then(
       function(result){
-        const db = wx.cloud.database({
-          env: 'test-4qsby'
-        })
         var longitudeMax = Math.max(result[1] - 0.003, result[1] + 0.003)
         var longitudeMin = Math.min(result[1] - 0.003, result[1] + 0.003)
         var latitudeMax = Math.max(result[0] - 0.003, result[0] + 0.003)
@@ -131,11 +131,13 @@ Page({
 
         console.log('hrMax: ' + hrMax)
         console.log('hrMin: ' + hrMin)
+        console.log(that.data.open_id)
+
         db.collection('users').where({
-          //longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
-          //latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax)),
-          //date: date,
-          //time: db.command.gt(hrMin).and(db.command.lt(hrMax)),
+          longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
+          latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax)),
+          date: date,
+          time: db.command.gt(hrMin).and(db.command.lt(hrMax)),
           type: 0
         }).get({
           success: res => {
@@ -149,7 +151,7 @@ Page({
                 longitude: res.data[key].longitude,
                 time: res.data[key].time,
                 date: res.data[key].date,
-                _openid: res.data[key]._openid,
+                _id: res.data[key]._id,
                 width: 30,
                 height: 30,
                 callout: {
@@ -181,27 +183,43 @@ Page({
 
   buttontap: function(e){
     console.log(e.detail)
+    var that = this
     if(e.detail.item.text === 'Confirm'){
-      const db = wx.cloud.database({
-        env: 'test-4qsby'
+      let promise = new Promise(function(resolve, reject){
+        db.collection('users').doc(that.data.open_id).update({
+          data: {
+            type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
+            latitude: that.data.selectedMarker.latitude,
+            longitude: that.data.selectedMarker.longitude,
+            time: that.data.selectedMarker.time
+          }
+        })
+        console.log(that.data.selectedMarker._id);
+        db.collection('users').doc(that.data.selectedMarker._id).update({
+          data: {
+            type: 2 // -1 initial, 0 leaver, 1 parker, 2, process
+          },
+          success: function(res) {
+            console.log(res.data)
+            resolve();
+          },
+          fail: function(err){
+            console.log(err)
+            reject();
+          }
+        })
       })
-      db.collection('users').doc(this.data.open_id).update({
-        data: {
-          type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
-          latitude: this.data.selectedMarker.latitude,
-          longitude: this.data.selectedMarker.longitude,
-          time: this.data.selectedMarker.time
+      promise.then(function(){
+        // redirect to index
+        wx.reLaunch({
+          url: '../index/index?open_id=' + that.data.open_id + '&type=1'
+        })
+      }).catch(
+        function(){
+          console.log('error...')
         }
-      })
-      db.collection('users').doc(this.data._openid).update({
-        data: {
-          type: 2, // -1 initial, 0 leaver, 1 parker, 2, process
-        }
-      })
-      // redirect to index
-      wx.reLaunch({
-        url: '../index/index?open_id=' + this.data.open_id + '&type=1'
-      })
+      )
+
       
     } else {
       console.log('err')
@@ -219,9 +237,6 @@ Page({
     console.log('At Mapping page ->', options.open_id);
     this.setData({
       open_id: options.open_id
-    })
-    const db = wx.cloud.database({
-      env: 'test-4qsby'
     })
     db.collection('users').doc(this.data.open_id).get().then(
       res => {
