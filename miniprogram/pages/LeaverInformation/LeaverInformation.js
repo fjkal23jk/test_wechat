@@ -57,7 +57,7 @@ Page({
     for(data in info){
       if(info.hasOwnProperty(data)) size++;
     }
-    if(size === 6 && this.data.latitude !== '' && this.data.longtitude !== '') return true;
+    if(size >= 6 && this.data.latitude !== '' && this.data.longtitude !== '') return true;
     else return false;
   },
 
@@ -92,15 +92,9 @@ Page({
         }
       })
     
-      
-      wx.showToast({
-        title: 'Good to go',
-        icon: 'none',
-        duration: 2000
-      });
-      // wx.navigateTo({
-      //   url: '../Code/Code'
-      // })
+      wx.reLaunch({
+        url: '../index/index?open_id=' + that.data.open_id + '&type=0'
+      })
     }
   },
   pickerConfirm(e) {

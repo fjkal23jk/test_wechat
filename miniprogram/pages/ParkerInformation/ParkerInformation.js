@@ -28,7 +28,8 @@ Page({
     for(data in info){
       if(info.hasOwnProperty(data)) size++;
     }
-    if (size === 6) return true;
+    console.log(size);
+    if (size >= 6) return true;
     else return false;
   },
   Map_Page: function(){
@@ -56,6 +57,11 @@ Page({
           name: info['name'],
           note: info['note'],
           time: info['time'],
+        },
+        success: function(){
+          while(info.length !== 0){
+            info.pop()
+          }
         }
       })
       console.log('finished updating')
@@ -112,11 +118,8 @@ Page({
 
   onLoad: function (options) {
     console.log('At Parker page ->', options.open_id);
-    var today = new Date()
-    var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
     this.setData({
-      open_id: options.open_id,
-      date: currentDate
+      open_id: options.open_id
     })
     
   },

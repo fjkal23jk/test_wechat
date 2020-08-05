@@ -96,7 +96,7 @@ Page({
             longitude: position_longitude,
             width: 30,
             height: 30,
-            
+            _id: that.data.open_id
           })
         that.setData({
           address: position_address,
@@ -137,25 +137,35 @@ Page({
           longitude: db.command.gt(longitudeMin).and(db.command.lt(longitudeMax)),
           latitude: db.command.gt(latitudeMin).and(db.command.lt(latitudeMax)),
           date: date,
-          time: db.command.gt(hrMin).and(db.command.lt(hrMax)),
-          type: 0
+          time: db.command.gt(hrMin).and(db.command.lt(hrMax))
         }).get({
           success: res => {
             console.log(res);
             var i = 0;
-            for (var key in res.data) {
+            let leaverArray = [];
+            let processingArray = [];
+            for (let key in res.data) {
+              if(res.data[key].type === 0){
+                leaverArray.push(res.data[key]);
+              } else if(res.data[key].type === 1){
+                processingArray.push(res.data[key].parkingOn)
+              }
+            }
+            let resultArray = leaverArray.filter(n => !processingArray.includes(n._id))
+            console.log(resultArray);
+            for(let key in resultArray){
               tempMarkers.push({
                 iconPath: "/images/user.png",
                 id: i,
-                latitude: res.data[key].latitude,
-                longitude: res.data[key].longitude,
-                time: res.data[key].time,
-                date: res.data[key].date,
-                _id: res.data[key]._id,
+                latitude: resultArray[key].latitude,
+                longitude: resultArray[key].longitude,
+                time: resultArray[key].time,
+                date: resultArray[key].date,
+                _id: resultArray[key]._id,
                 width: 30,
                 height: 30,
                 callout: {
-                  content: res.data[key].name,
+                  content: resultArray[key].name,
                   fontSize: 14,
                   bgColor: "#FFF",
                   borderWidth: 1,
@@ -170,14 +180,15 @@ Page({
             that.setData({
               markers: tempMarkers
             })
-            console.log('done')
+            resolve()
           },
           fail: err => {
             console.log(err);
+            reject()
           }
         })
-      }
-    )
+      })
+
     
   },
 
@@ -191,23 +202,18 @@ Page({
             type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
             latitude: that.data.selectedMarker.latitude,
             longitude: that.data.selectedMarker.longitude,
-            time: that.data.selectedMarker.time
-          }
-        })
-        console.log(that.data.selectedMarker._id);
-        db.collection('users').doc(that.data.selectedMarker._id).update({
-          data: {
-            type: 2 // -1 initial, 0 leaver, 1 parker, 2, process
+            time: that.data.selectedMarker.time,
+            parkingOn: that.data.selectedMarker._id
           },
-          success: function(res) {
-            console.log(res.data)
-            resolve();
+          success: function(){
+            resolve()
           },
           fail: function(err){
             console.log(err)
-            reject();
+            reject()
           }
         })
+        console.log(that.data.selectedMarker._id);
       })
       promise.then(function(){
         // redirect to index

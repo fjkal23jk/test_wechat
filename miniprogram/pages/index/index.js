@@ -166,7 +166,8 @@ Page({
               license_plate: '',
               type: -1, // -1 initial, 0 leaver, 1 parker , 2 in process 
               time: '00:00',
-              date: '0000-00-00'
+              date: '0000-00-00',
+              parkingOn: '' // for parker, store leaver's _id
             }
           })
         })
