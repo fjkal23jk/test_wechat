@@ -1,4 +1,8 @@
 // pages/Code/Code.js
+const db = wx.cloud.database({
+  env: 'test-4qsby'
+});
+
 Page({
 
   /**
@@ -50,9 +54,6 @@ Page({
       current_full_time: current_time
     })
     var that = this
-    const db = wx.cloud.database({
-      env: 'test-4qsby'
-    });
     db.collection('users').doc(this.data.open_id).get().then(
       res => {
         var booked_time = parseInt(res.data.time.substring(0, 2))*60 + parseInt(res.data.time.substring(3, )) - 30;
@@ -110,6 +111,25 @@ Page({
       url: '../index/index?open_id=' + this.data.open_id + '&type=-1'
     })
   }, //special type for booked spot(in process)
+
+  confirm: function(){
+    db.collection('users').doc(this.data.open_id).get({
+      success: res=>{
+        if(res.data.type === 0){
+
+          wx.redirectTo({
+            url: '../Confirm/Confirm?open_id=' + this.data.open_id + '&type=0'
+          })
+        } else if(res.data.type === 1){
+
+          wx.redirectTo({
+            url: '../Confirm/Confirm?open_id=' + this.data.open_id + '&type=1'
+          })
+        }
+      }
+    })
+  },
+
 
   openMap: function(){
   

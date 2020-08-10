@@ -197,23 +197,33 @@ Page({
     var that = this
     if(e.detail.item.text === 'Confirm'){
       let promise = new Promise(function(resolve, reject){
-        db.collection('users').doc(that.data.open_id).update({
-          data: {
-            type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
-            latitude: that.data.selectedMarker.latitude,
-            longitude: that.data.selectedMarker.longitude,
-            time: that.data.selectedMarker.time,
-            parkingOn: that.data.selectedMarker._id
-          },
-          success: function(){
-            resolve()
-          },
-          fail: function(err){
-            console.log(err)
-            reject()
+        db.collection('users').where({
+          parkingOn: that.data.selectedMarker._id
+        }).get({
+          success: res => {
+            console.log(res)
+            if(res.data.length !== 0){
+              wx.showToast({
+                title: 'Book Failed',
+              })
+              reject()
+            } else {
+              console.log('no one parking on that spot')
+              db.collection('users').doc(that.data.open_id).update({
+                data: {
+                  type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
+                  latitude: that.data.selectedMarker.latitude,
+                  longitude: that.data.selectedMarker.longitude,
+                  time: that.data.selectedMarker.time,
+                  parkingOn: that.data.selectedMarker._id
+                },
+                success: function(){
+                  resolve()
+                }
+              })
+            }
           }
         })
-        console.log(that.data.selectedMarker._id);
       })
       promise.then(function(){
         // redirect to index
@@ -222,7 +232,7 @@ Page({
         })
       }).catch(
         function(){
-          console.log('error...')
+          console.log('Someone parked on that spot')
         }
       )
 

@@ -1,2 +1,12 @@
 <!--pages/Confirm/Confirm.wxml-->
-<text>pages/Confirm/Confirm.wxml</text>
+<block wx:if="{{!type}}">
+  <!-- QR Code -->
+  <text>Begin drawing</text>
+  <canvas style="width: 200px; height: 200px;" canvas-id="myQrcode"></canvas>
+  <button bindtap="getQRCode">Get QR Code</button>
+  <text>Finish drawing</text>
+</block>
+<block wx:else>
+  <!-- Scanning -->
+  <button bindtap="openScanner">Scan</button>
+</block>

@@ -3,6 +3,7 @@
 <button bindtap="openMap">Find Your Destination</button>
 <text >\n\n</text>
 <button bindtap="withdraw">Withdraw</button>
+<button bindtap="confirm">Confirm</button>
 
 <view>
     <mp-halfScreenDialog 
