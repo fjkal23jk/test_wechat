@@ -104,7 +104,8 @@ Page({
               type: -1, // -1 initial, 0 leaver, 1 parker 
               time: '00:00',
               date: '0000-00-00',
-              parkingOn: ''
+              parkingOn: '',
+              encodedMsg: ''
             }
     })
     wx.reLaunch({

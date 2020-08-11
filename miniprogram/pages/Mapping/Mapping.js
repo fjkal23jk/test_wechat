@@ -209,19 +209,27 @@ Page({
               reject()
             } else {
               console.log('no one parking on that spot')
-              db.collection('users').doc(that.data.open_id).update({
-                data: {
-                  type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
-                  latitude: that.data.selectedMarker.latitude,
-                  longitude: that.data.selectedMarker.longitude,
-                  time: that.data.selectedMarker.time,
-                  parkingOn: that.data.selectedMarker._id
-                },
-                success: function(){
-                  resolve()
+              db.collection('users').doc(that.data.selectedMarker._id).get({
+                success: res=> {
+                  resolve(res.data.encodedMsg)
                 }
               })
             }
+          }
+        })
+      })
+      promise.then(function(res){
+        db.collection('users').doc(that.data.open_id).update({
+          data: {
+            type: 1, // -1 initial, 0 leaver, 1 parker, 2, process
+            latitude: that.data.selectedMarker.latitude,
+            longitude: that.data.selectedMarker.longitude,
+            time: that.data.selectedMarker.time,
+            parkingOn: that.data.selectedMarker._id,
+            encodedMsg: res
+          },
+          success: function(){
+            resolve()
           }
         })
       })

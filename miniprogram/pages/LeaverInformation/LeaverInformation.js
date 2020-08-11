@@ -2,6 +2,14 @@
 var info = {};
 var position_latitude = '';
 var position_longitude = '';
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
 Page({
   get_user_location: function(){
     var that = this
@@ -61,6 +69,8 @@ Page({
     else return false;
   },
 
+
+
   Code_Page: function(){
     // if something isn't entered, use a pop up to notifiy the user,
     // otherwise navigate to next page.
@@ -77,6 +87,13 @@ Page({
       });
       console.log(info);
       var that = this
+      let firstChar = getRandomInt(0x4E00, 0x9FBB);
+      let secondChar = getRandomInt(0x4E00, 0x9FBB);
+      let thirdChar = getRandomInt(0x4E00, 0x9FBB);
+      // let secondChar = getRandomInt(0x20000, 0x2A6D6);
+      // let thirdChar = getRandomInt(1, 10000);
+      let msg = String.fromCodePoint(firstChar, secondChar, thirdChar);
+      
       db.collection('users').doc(this.data.open_id).update({
         data: {
           car_brand: info['car_brand'],
@@ -88,7 +105,8 @@ Page({
           time: info['time'],
           latitude: that.data.latitude,
           longitude: that.data.longitude,
-          type: 0
+          type: 0,
+          encodedMsg: msg
         }
       })
     

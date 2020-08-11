@@ -1,5 +1,10 @@
 // pages/Confirm/Confirm.js
 import drawQrcode from './weapp.qrcode.min.js'
+const db = wx.cloud.database({
+  env: 'test-4qsby'
+});
+
+
 
 Page({
 
@@ -8,10 +13,14 @@ Page({
    */
   data: {
     open_id: '',
-    type: -1
+    type: -1,
+    encodedMsg: '',
+    status: '',
+    canClick: false
   },
 
   getQRCode: function(){
+    let that = this
     drawQrcode({
       width: 160,
       height: 160,
@@ -20,7 +29,7 @@ Page({
       canvasId: 'myQrcode',
       // ctx: wx.createCanvasContext('myQrcode'),
       typeNumber: 10,
-      text: 'fuck',
+      text: that.data.encodedMsg,
       callback(e) {
         console.log('e: ', e)
       }
@@ -28,13 +37,44 @@ Page({
   },
 
   openScanner: function(){
+    let that = this
+    const _ = db.command
     wx.scanCode({
       onlyFromCamera: true,
       scanType: ['qrCode'],
       success: res=>{
-        wx.showToast({
-          title: res.result,
-        })
+        console.log(res.result)
+        console.log(that.data.encodedMsg)
+        if(that.data.encodedMsg === res.result){   
+          
+          wx.showToast({
+            title: 'Confirmed',
+          })
+          that.setData({
+            status: 'Confirmed',
+            onClick: true
+          })
+          db.collection('users').doc(that.data.open_id).update({
+            data:{
+              points: _.inc(-1),
+              name: '',
+              longitude: '',
+              latitude: '',
+              car_brand: '',
+              car_color: '',
+              license_plate: '',
+              type: -1, // -1 initial, 0 leaver, 1 parker 
+              time: '00:00',
+              date: '0000-00-00',
+              parkingOn: '',
+              encodedMsg: ''
+            }
+          })
+        } else {
+          wx.showToast({
+            title: 'wrong person',
+          })
+        }
       }
     })
   },
@@ -43,17 +83,26 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    let that = this
     if(options.type === '0'){
-      this.setData({
+      that.setData({
         open_id: options.open_id,
         type: 0
       })
     } else {
-      this.setData({
+      that.setData({
         open_id: options.open_id,
         type: 1
       })
     }
+    db.collection('users').doc(options.open_id).get({
+      success: res =>{
+        that.setData({
+          encodedMsg: res.data.encodedMsg
+        })
+      }
+    })
+
   },
 
   /**
