@@ -117,10 +117,33 @@ Page({
     db.collection('users').doc(this.data.open_id).get({
       success: res=>{
         if(res.data.type === 0){
+          db.collection('users').where({
+            encodedMsg: res.data.encodedMsg
+          }).get({
+            success: result => {
+              // parker and leaver exist
+              if(result.data.length === 2){
+                let objectID = ''
+                let objectPoint = 0
+                if(result.data[0]._id === res.data._id){
+                  objectID = result.data[1]._id
+                  objectPoint = result.data[1].points
+                } else {
+                  objectID = result.data[0]._id
+                  objectPoint = result.data[0].points
+                }
 
-          wx.redirectTo({
-            url: '../Confirm/Confirm?open_id=' + this.data.open_id + '&type=0'
+                wx.redirectTo({
+                  url: '../Confirm/Confirm?open_id=' + this.data.open_id + '&type=0' + '&objectID=' + objectID + '&objectPoint=' + objectPoint
+                })
+              } else { // only leaver exist, parker withdrawn or leaver isn't selected yet
+                wx.showToast({
+                  title: 'Parker Not Exist',
+                })
+              }
+            }
           })
+
         } else if(res.data.type === 1){
 
           wx.redirectTo({

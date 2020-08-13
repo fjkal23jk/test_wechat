@@ -16,7 +16,9 @@ Page({
     type: -1,
     encodedMsg: '',
     status: '',
-    canClick: false
+    canClick: false,
+    objectID: '',
+    objectPoint: 0
   },
 
   getQRCode: function(){
@@ -52,7 +54,7 @@ Page({
           })
           that.setData({
             status: 'Confirmed',
-            onClick: true
+            canClick: true
           })
           db.collection('users').doc(that.data.open_id).update({
             data:{
@@ -79,6 +81,57 @@ Page({
     })
   },
 
+  finishConfirm: function(){
+    let that = this
+    const _ = db.command
+    // leaver clicks finish
+    if(this.data.type === 0){
+      db.collection('users').doc(this.data.objectID).get({
+        success: res=>{
+          // the right parker scanned the qrcode
+          if(res.data.points < that.data.objectPoint){
+            db.collection('users').doc(that.data.open_id).update({
+              data:{
+                points: _.inc(1),
+                name: '',
+                longitude: '',
+                latitude: '',
+                car_brand: '',
+                car_color: '',
+                license_plate: '',
+                type: -1, // -1 initial, 0 leaver, 1 parker 
+                time: '00:00',
+                date: '0000-00-00',
+                parkingOn: '',
+                encodedMsg: ''
+              }, success: result => {
+                wx.reLaunch({
+                  url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+                })
+              }
+            })
+          } else { // parker didn't scan yet    
+            wx.showToast({
+              title: 'Parker Scanned Failed',
+            })
+          }
+        }
+      })
+      
+
+    } else { // parker clicks finish
+      if(this.data.canClick === true){
+        wx.reLaunch({
+          url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+        })
+      } else {
+        wx.showToast({
+          title: 'Scan Item First',
+        })
+      }
+    }
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
@@ -87,7 +140,9 @@ Page({
     if(options.type === '0'){
       that.setData({
         open_id: options.open_id,
-        type: 0
+        type: 0,
+        objectID: options.objectID,
+        objectPoint: options.objectPoint
       })
     } else {
       that.setData({

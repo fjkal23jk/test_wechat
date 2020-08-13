@@ -87,9 +87,9 @@ Page({
       });
       console.log(info);
       var that = this
-      let firstChar = getRandomInt(0x4E00, 0x9FBB);
-      let secondChar = getRandomInt(0x4E00, 0x9FBB);
-      let thirdChar = getRandomInt(0x4E00, 0x9FBB);
+      let firstChar = getRandomInt(1, 1000);
+      let secondChar = getRandomInt(1, 1000);
+      let thirdChar = getRandomInt(1, 1000);
       // let secondChar = getRandomInt(0x20000, 0x2A6D6);
       // let thirdChar = getRandomInt(1, 10000);
       let msg = String.fromCodePoint(firstChar, secondChar, thirdChar);

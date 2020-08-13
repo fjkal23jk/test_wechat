@@ -10,5 +10,5 @@
 </block>
 
 <text>{{status}}</text>
-<button bindtap="finishConfirm" disabled="{{!canClick}}">Finish</button>
+<button bindtap="finishConfirm" >Finish</button>
 
