@@ -23,19 +23,90 @@ Page({
 
   getQRCode: function(){
     let that = this
-    drawQrcode({
-      width: 160,
-      height: 160,
-      x: 20,
-      y: 20,
-      canvasId: 'myQrcode',
-      // ctx: wx.createCanvasContext('myQrcode'),
-      typeNumber: 10,
-      text: that.data.encodedMsg,
-      callback(e) {
-        console.log('e: ', e)
+    let promise = new Promise(function(resolve, reject){
+      var date = new Date();
+      var curr_year = date.getFullYear(); 
+      var curr_month = date.getMonth()+1;
+      if (curr_month < 10){
+        curr_month = "0"+curr_month;
       }
-    })
+      var curr_date = date.getDate();
+      if (curr_date < 10){
+        curr_date = "0"+curr_date;
+      }
+      var curr_full_date = curr_year+"-"+curr_month+"-"+curr_date;
+      var curr_min = date.getMinutes()+3;
+      if (curr_min < 10){
+        curr_min = "0"+curr_min;
+      }
+      var curr_hour = date.getHours()*60;
+      var curr_full_time = curr_hour + parseInt(curr_min);
+
+      db.collection('users').doc(that.data.open_id).get({
+        success: res=> {
+          if (res.data.date < curr_full_date && res.data.type === 0){
+            resolve (true);
+          }
+          else{
+            var total_mins = parseInt(res.data.time.substring(0,2))*60 + parseInt(res.data.time.substring(3)) 
+            if ( total_mins < curr_full_time && res.data.type === 0){
+              resolve (true);
+            }
+            else{
+              console.log("here")
+              resolve (false);
+            }
+          }
+        }
+      })
+      
+    });
+    promise.then(
+      function(resolve){
+        if (resolve === true){
+          db.collection('users').doc(that.data.open_id).update({
+          data:{
+            name: '',
+            longitude: '',
+            latitude: '',
+            car_brand: '',
+            car_color: '',
+            license_plate: '',
+            type: -1, // -1 initial, 0 leaver, 1 parker 
+            time: '00:00',
+            date: '0000-00-00',
+            parkingOn: '',
+            encodedMsg: '',
+            current_Time: '',
+            current_Longitude: '',
+            current_latitude: ''
+            }
+          })
+        wx.reLaunch({
+          url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+        })
+        wx.showToast({
+          title: 'Time Passed',
+        })
+      }
+      else{
+        drawQrcode({
+          width: 160,
+          height: 160,
+          x: 20,
+          y: 20,
+          canvasId: 'myQrcode',
+          // ctx: wx.createCanvasContext('myQrcode'),
+          typeNumber: 10,
+          text: that.data.encodedMsg,
+          callback(e) {
+            console.log('e: ', e)
+          }
+        })
+      }
+      }
+    )
+    
   },
 
   openScanner: function(){
@@ -69,7 +140,10 @@ Page({
               time: '00:00',
               date: '0000-00-00',
               parkingOn: '',
-              encodedMsg: ''
+              encodedMsg: '',
+              current_Time: '',
+              current_Longitude: '',
+              current_latitude: ''
             }
           })
         } else {
@@ -103,7 +177,10 @@ Page({
                 time: '00:00',
                 date: '0000-00-00',
                 parkingOn: '',
-                encodedMsg: ''
+                encodedMsg: '',
+                current_Time: '',
+                current_Longitude: '',
+                current_latitude: ''
               }, success: result => {
                 wx.reLaunch({
                   url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
