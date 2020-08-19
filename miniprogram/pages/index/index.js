@@ -9,6 +9,10 @@ var check_type = false;
 const db = wx.cloud.database({
   env: 'test-4qsby'
 });
+var EnableMsg = '';
+let objectID = ''
+let objectPoint = 0
+const _ = db.command
 
 Page({
 
@@ -50,14 +54,19 @@ Page({
       }
       var curr_hour = date.getHours()*60;
       var curr_full_time = curr_hour + parseInt(curr_min);
+      console.log(curr_min)
+      console.log(date.getHours())
 
       db.collection('users').doc(that.data.open_id).get({
         success: res=> {
+          EnableMsg = res.data.encodedMsg
           if (res.data.date < curr_full_date && res.data.type === 0){
             resolve (true);
           }
           else{
-            var total_mins = parseInt(res.data.time.substring(0,2))*60 + parseInt(res.data.time.substring(3)) 
+            var total_mins = parseInt(res.data.time.substring(0,2))*60 + parseInt(res.data.time.substring(3))
+            console.log(total_mins);
+            console.log(curr_full_time); 
             if ( total_mins < curr_full_time && res.data.type === 0){
               resolve (true);
             }
@@ -72,25 +81,86 @@ Page({
     });
     promise.then(
       function(resolve){
+        console.log("resolve->",resolve)
         if (resolve === true){
-          db.collection('users').doc(that.data.open_id).update({
-          data:{
-            name: '',
-            longitude: '',
-            latitude: '',
-            car_brand: '',
-            car_color: '',
-            license_plate: '',
-            type: -1, // -1 initial, 0 leaver, 1 parker 
-            time: '00:00',
-            date: '0000-00-00',
-            parkingOn: '',
-            encodedMsg: '',
-            current_Time: '',
-            current_Longitude: '',
-            current_latitude: ''
+          //update for points
+          // check parker's location, if parker's location does not exsist, then reset all
+          // else{
+          //      if parker in range, leaver decrement point  
+          //} 
+          db.collection('users').where({
+            encodedMsg: EnableMsg
+          }).get({
+            success: result => {
+              // parker and leaver exist
+              console.log("line 96")
+              if(result.data.length === 2){
+                if(result.data[0]._id === res.data._id){
+                  objectID = result.data[1]._id
+                  objectPoint = result.data[1].points
+                } else {
+                  objectID = result.data[0]._id
+                  objectPoint = result.data[0].points
+                }
+              }
+              db.collection('users').doc(objectID).get({
+                success: result_for_object => {
+                  console.log("line 108")
+                  if (result_for_object.data.current_Time <= result_for_object.data.time && 
+                    result_for_object.data.current_latitude <= result_for_object.data.latitude + 0.003 && 
+                    result_for_object.data.current_latitude >= result_for_object.data.latitude -0.003 && 
+                    result_for_object.data.current_Longitude <= result_for_object.data.longitude + 0.003 && 
+                    result_for_object.data.current_Longitude >= result_for_object.data.longitude - 0.003 ) {
+                      console.log("line 114")
+                      db.collection('users').doc(that.data.open_id).update({
+                        data:{
+                          name: '',
+                          longitude: '',
+                          latitude: '',
+                          car_brand: '',
+                          car_color: '',
+                          license_plate: '',
+                          type: -1, // -1 initial, 0 leaver, 1 parker 
+                          time: '00:00',
+                          date: '0000-00-00',
+                          parkingOn: '',
+                          encodedMsg: '',
+                          current_Time: '',
+                          current_Longitude: '',
+                          current_latitude: '',
+                          points: _.inc(-1)
+                          }
+                        })
+                  }
+                  else{
+                    console.log("in else")
+                    db.collection('users').doc(that.data.open_id).update({
+                      data:{
+                        name: '',
+                        longitude: '',
+                        latitude: '',
+                        car_brand: '',
+                        car_color: '',
+                        license_plate: '',
+                        type: -1, // -1 initial, 0 leaver, 1 parker 
+                        time: '00:00',
+                        date: '0000-00-00',
+                        parkingOn: '',
+                        encodedMsg: '',
+                        current_Time: '',
+                        current_Longitude: '',
+                        current_latitude: ''
+                        }
+                      })
+                  }
+                },
+                fail: err=>{
+                  console.log("line 158")
+                }
+              })
             }
           })
+
         wx.reLaunch({
           url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
         })

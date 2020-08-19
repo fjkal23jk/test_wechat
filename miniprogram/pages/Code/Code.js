@@ -83,30 +83,83 @@ Page({
     promise.then(
       function(resolve){
         if(resolve){
-          db.collection('users').doc(that.data.open_id).update({
-            data:{
-              name: '',
-              longitude: '',
-              latitude: '',
-              car_brand: '',
-              car_color: '',
-              license_plate: '',
-              type: -1, // -1 initial, 0 leaver, 1 parker 
-              time: '00:00',
-              date: '0000-00-00',
-              parkingOn: '',
-              encodedMsg: '',
-              current_Time: '',
-              current_Longitude: '',
-              current_latitude: ''
+          //update for points
+          // check parker's location, if parker's location does not exsist, then reset all
+          // else{
+          //      if parker in range, leaver decrement point  
+          //} 
+          db.collection('users').where({
+            encodedMsg: EnableMsg
+          }).get({
+            success: result => {
+              // parker and leaver exist
+              if(result.data.length === 2){
+                if(result.data[0]._id === res.data._id){
+                  objectID = result.data[1]._id
+                  objectPoint = result.data[1].points
+                } else {
+                  objectID = result.data[0]._id
+                  objectPoint = result.data[0].points
+                }
               }
-            })
-          wx.reLaunch({
-            url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+              db.collection('users').doc(objectID).get({
+                success: result_for_object => {
+                  if (result_for_object.data.current_Time <= result_for_object.data.time && 
+                    result_for_object.data.current_latitude <= result_for_object.data.latitude + 0.003 && 
+                    result_for_object.data.current_latitude >= result_for_object.data.latitude -0.003 && 
+                    result_for_object.data.current_Longitude <= result_for_object.data.longitude + 0.003 && 
+                    result_for_object.data.current_Longitude >= result_for_object.data.longitude - 0.003 ) {
+                      db.collection('users').doc(that.data.open_id).update({
+                        data:{
+                          name: '',
+                          longitude: '',
+                          latitude: '',
+                          car_brand: '',
+                          car_color: '',
+                          license_plate: '',
+                          type: -1, // -1 initial, 0 leaver, 1 parker 
+                          time: '00:00',
+                          date: '0000-00-00',
+                          parkingOn: '',
+                          encodedMsg: '',
+                          current_Time: '',
+                          current_Longitude: '',
+                          current_latitude: '',
+                          points: _.inc(-1)
+                          }
+                        })
+                  }
+                  else{
+                    db.collection('users').doc(that.data.open_id).update({
+                      data:{
+                        name: '',
+                        longitude: '',
+                        latitude: '',
+                        car_brand: '',
+                        car_color: '',
+                        license_plate: '',
+                        type: -1, // -1 initial, 0 leaver, 1 parker 
+                        time: '00:00',
+                        date: '0000-00-00',
+                        parkingOn: '',
+                        encodedMsg: '',
+                        current_Time: '',
+                        current_Longitude: '',
+                        current_latitude: ''
+                        }
+                      })
+                  }
+                }
+              })
+            }
           })
-          wx.showToast({
-            title: 'Time Passed',
-          })
+
+        wx.reLaunch({
+          url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+        })
+        wx.showToast({
+          title: 'Time Passed',
+        })
         }
         else{
           if (current_date < 10){
@@ -156,7 +209,10 @@ Page({
           // 3. cancel the task
         }
       }
-    )
+    ).catch(
+      function(reject){
+      console.log("handle failiure")
+    })
    
 
 
@@ -229,35 +285,90 @@ Page({
       
     });
     promise.then(
+      
       function(resolve){
+        console.log(resolve)
         if(resolve){
-          db.collection('users').doc(that.data.open_id).update({
-            data:{
-              name: '',
-              longitude: '',
-              latitude: '',
-              car_brand: '',
-              car_color: '',
-              license_plate: '',
-              type: -1, // -1 initial, 0 leaver, 1 parker 
-              time: '00:00',
-              date: '0000-00-00',
-              parkingOn: '',
-              encodedMsg: '',
-              current_Time: '',
-              current_Longitude: '',
-              current_latitude: ''
+          //update for points
+          // check parker's location, if parker's location does not exsist, then reset all
+          // else{
+          //      if parker in range, leaver decrement point  
+          //} 
+          db.collection('users').where({
+            encodedMsg: EnableMsg
+          }).get({
+            success: result => {
+              // parker and leaver exist
+              if(result.data.length === 2){
+                if(result.data[0]._id === res.data._id){
+                  objectID = result.data[1]._id
+                  objectPoint = result.data[1].points
+                } else {
+                  objectID = result.data[0]._id
+                  objectPoint = result.data[0].points
+                }
               }
-            })
-          wx.reLaunch({
-            url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+              db.collection('users').doc(objectID).get({
+                success: result_for_object => {
+                  if (result_for_object.data.current_Time <= result_for_object.data.time && 
+                    result_for_object.data.current_latitude <= result_for_object.data.latitude + 0.003 && 
+                    result_for_object.data.current_latitude >= result_for_object.data.latitude -0.003 && 
+                    result_for_object.data.current_Longitude <= result_for_object.data.longitude + 0.003 && 
+                    result_for_object.data.current_Longitude >= result_for_object.data.longitude - 0.003 ) {
+                      db.collection('users').doc(that.data.open_id).update({
+                        data:{
+                          name: '',
+                          longitude: '',
+                          latitude: '',
+                          car_brand: '',
+                          car_color: '',
+                          license_plate: '',
+                          type: -1, // -1 initial, 0 leaver, 1 parker 
+                          time: '00:00',
+                          date: '0000-00-00',
+                          parkingOn: '',
+                          encodedMsg: '',
+                          current_Time: '',
+                          current_Longitude: '',
+                          current_latitude: '',
+                          points: _.inc(-1)
+                          }
+                        })
+                  }
+                  else{
+                    db.collection('users').doc(that.data.open_id).update({
+                      data:{
+                        name: '',
+                        longitude: '',
+                        latitude: '',
+                        car_brand: '',
+                        car_color: '',
+                        license_plate: '',
+                        type: -1, // -1 initial, 0 leaver, 1 parker 
+                        time: '00:00',
+                        date: '0000-00-00',
+                        parkingOn: '',
+                        encodedMsg: '',
+                        current_Time: '',
+                        current_Longitude: '',
+                        current_latitude: ''
+                        }
+                      })
+                  }
+                }
+              })
+            }
           })
-          wx.showToast({
-            title: 'Time Passed',
-          })
+
+        wx.reLaunch({
+          url: '../index/index?open_id=' + that.data.open_id + '&type=-1'
+        })
+        wx.showToast({
+          title: 'Time Passed',
+        })
         }
         else{
-          db.collection('users').doc(this.data.open_id).get({
+          db.collection('users').doc(that.data.open_id).get({
             success: res=>{
               if(res.data.type === 0){
                 db.collection('users').where({
@@ -275,6 +386,7 @@ Page({
                         objectID = result.data[0]._id
                         objectPoint = result.data[0].points
                       }
+                      console.log("line 389")
                       db.collection('users').doc(objectID).get({
                        success: res=>{
                         if (res.data.current_Time <= res.data.time && res.data.current_latitude <= res.data.latitude + 0.003 && 
@@ -306,28 +418,43 @@ Page({
                 if (curr_hour < 10){
                   curr_hour = "0"+curr_hour;
                 }
+                let latitude = 0;
+                let longitude = 0;
                 var curr_full_time = curr_hour +":"+ parseInt(curr_min);
                 wx.getLocation({
                   type: 'wgs84',
-                  success (res) {
-                    let latitude = res.latitude
-                    let longitude = res.longitude
+                  success (result_for_location) {
+                    latitude = result_for_location.latitude
+                    longitude = result_for_location.longitude
+                    console.log("line 428", latitude, longitude)
+                    db.collection("users").doc(res.data._id).update({
+                      data: {
+                      current_Time: curr_full_time,
+                      current_latitude: latitude,
+                      current_Longitude: longitude,
+                      },
+                      success: result_to_update =>{
+                        wx.redirectTo({
+                          url: '../Confirm/Confirm?open_id=' + res.data.open_id + '&type=1'
+                        })
+                      },
+                      fail: fail_here =>{
+                        console.log("line 440")
+                      }
+                    })
+
+                    
                   }
-                })
-                db.collection("users").doc(res.data._id).update({
-                  current_Time: curr_full_time,
-                  current_latitude: latitude,
-                  current_Longitude: longitude
-                })
-                wx.redirectTo({
-                  url: '../Confirm/Confirm?open_id=' + this.data.open_id + '&type=1'
                 })
               }
             }
           })
         }
       }
-    )
+    ).catch(
+      function(reject){
+      console.log("handle failiure")
+    })
     
   },
 
@@ -415,7 +542,10 @@ Page({
           )
         }
       }
-    )
+    ).catch(
+      function(reject){
+      console.log("handle failiure")
+    })
     
   },
 
